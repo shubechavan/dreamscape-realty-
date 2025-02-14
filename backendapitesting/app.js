@@ -6,7 +6,7 @@ import cors from "cors"
 import nodemailer from "nodemailer"
 import dotenv from "dotenv" // Import dotenv
 
-dotenv.config() // Load environment variables
+dotenv.config() 
 
 const app = express()
 app.use(express.json())
