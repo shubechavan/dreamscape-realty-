@@ -15,7 +15,6 @@ app.use(cors())
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
-// Connect to MongoDB using the MONGODB_URI from .env
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 // Define MongoDB schemas and models
