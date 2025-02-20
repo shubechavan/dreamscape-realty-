@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import cors from "cors"
 import nodemailer from "nodemailer"
-import dotenv from "dotenv" // Import dotenv
+import dotenv from "dotenv"
 
 dotenv.config()
 
