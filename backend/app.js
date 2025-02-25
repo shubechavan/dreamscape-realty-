@@ -17,7 +17,6 @@ mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTop
 
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
-// Define MongoDB schemas and models
 const UserSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
