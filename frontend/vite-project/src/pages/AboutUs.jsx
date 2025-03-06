@@ -87,8 +87,8 @@ const AboutUs = () => {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">Our Mentor</h2>
               <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-                <h3 className="text-xl font-semibold text-blue-700 mb-2">[Mentor's Name]</h3>
-                <p className="text-gray-600">[Institution Name]</p>
+                <h3 className="text-xl font-semibold text-blue-700 mb-2">Arun Maurya</h3>
+                <p className="text-gray-600">KPB Hinduja College</p>
                 <p className="text-gray-600 mt-2">
                   A guiding force behind our project, providing invaluable insights and mentorship.
                 </p>
