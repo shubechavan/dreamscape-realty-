@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { Eye, EyeOff } from "lucide-react"
 import axios from "axios"
+import { useAuth } from "../context/AuthContext"
 
 function AdminLogin() {
   const [showPassword, setShowPassword] = useState(false)
@@ -13,6 +14,7 @@ function AdminLogin() {
   })
   const [error, setError] = useState("")
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -30,11 +32,12 @@ function AdminLogin() {
       if (response.data.token) {
         localStorage.setItem("adminToken", response.data.token)
         localStorage.setItem("adminEmail", formData.email)
+        login(response.data.token, formData.email, "admin")
         navigate("/admin/dashboard")
       }
     } catch (error) {
       console.error("Login error:", error)
-      setError(error.response?.data?.msg || "An error occurred during login")
+      setError(error.response?.data?.error || "An error occurred during login")
     }
   }
 

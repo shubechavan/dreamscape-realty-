@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Search } from "lucide-react"
 import { Link } from "react-router-dom"
-import React from "react"
+import  React from "react"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
 
@@ -15,7 +15,7 @@ function Home() {
     e.preventDefault()
     console.log("Search query:", searchQuery) // Debug log
     try {
-      const response = await axios.get(`http://localhost:3000/api/properties/search?query=${searchQuery}`)
+      const response = await axios.get(`https://dreamscape-realty.onrender.com/api/properties/search?query=${searchQuery}`)
       console.log("Search response:", response.data) // Debug log
       navigate("/search-results", { state: { results: response.data } })
     } catch (error) {
@@ -25,6 +25,8 @@ function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
+   
+
       {/* Hero Section */}
       <div className="relative h-[700px]">
         <div

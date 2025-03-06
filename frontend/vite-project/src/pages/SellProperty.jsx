@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { useNavigate } from "react-router-dom"
-import axios from "axios"
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const SellProperty = () => {
   const [formData, setFormData] = useState({
@@ -15,26 +15,27 @@ const SellProperty = () => {
     bedrooms: "",
     bathrooms: "",
     parking: "",
-  })
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
+    imageUrl: "", // Added image URL field
+  });
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-  }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
     try {
-      const token = localStorage.getItem("userToken")
-      await axios.post("http://localhost:3000/api/property/sell", formData, {
+      const token = localStorage.getItem("userToken");
+      await axios.post("https://dreamscape-realty.onrender.com/api/property/sell", formData, {
         headers: { Authorization: `Bearer ${token}` },
-      })
-      navigate("/properties")
+      });
+      navigate("/properties");
     } catch (error) {
-      setError(error.response?.data?.error || "An error occurred while submitting the property.")
+      setError(error.response?.data?.error || "An error occurred while submitting the property.");
     }
-  }
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -77,6 +78,20 @@ const SellProperty = () => {
             id="price"
             name="price"
             value={formData.price}
+            onChange={handleChange}
+            required
+            className="w-full px-3 py-2 border rounded"
+          />
+        </div>
+        <div className="mb-4">
+          <label htmlFor="imageUrl" className="block mb-2">
+            Image URL
+          </label>
+          <input
+            type="text"
+            id="imageUrl"
+            name="imageUrl"
+            value={formData.imageUrl}
             onChange={handleChange}
             required
             className="w-full px-3 py-2 border rounded"
@@ -171,8 +186,7 @@ const SellProperty = () => {
         </button>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default SellProperty
-
+export default SellProperty;

@@ -14,7 +14,7 @@ function Dashboard({ isAdmin }) {
     const fetchDashboardData = async () => {
       try {
         const token = localStorage.getItem(isAdmin ? "adminToken" : "userToken")
-        const response = await axios.get(`http://localhost:3000/api/${isAdmin ? "admin" : "user"}/dashboard`, {
+        const response = await axios.get(`https://dreamscape-realty.onrender.com/api/${isAdmin ? "admin" : "user"}/dashboard`, {
           headers: { Authorization: `Bearer ${token}` },
         })
         console.log("Dashboard data:", response.data)

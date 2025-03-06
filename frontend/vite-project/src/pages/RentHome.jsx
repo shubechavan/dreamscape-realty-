@@ -14,7 +14,7 @@ const RentHome = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/properties");
+        const response = await fetch("https://dreamscape-realty.onrender.com/api/properties");
         if (!response.ok) throw new Error("Failed to fetch properties");
 
         const data = await response.json();
