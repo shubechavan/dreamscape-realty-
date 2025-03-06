@@ -1,107 +1,90 @@
 # dreamscape-realty-
-# 🌍 Dreamscape Realty
+<div align="center">
+  <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp_Image_2024-07-14_at_14.48.13_6a45f127-removebg-gJJvyU2V484RGIQT5DEYeT3E7HwC4O.png" alt="Dreamscape Realty Logo" width="200">
+  
+  # Dreamscape Realty
+  **A Modern Property Booking Platform**
+</div>
 
-![Dreamscape Realty Banner](https://via.placeholder.com/1000x300?text=Dreamscape+Realty)
+## 🌍 About Dreamscape Realty
+Dreamscape Realty is a **real estate platform** designed to help users **explore, book, and manage properties effortlessly**. Built with a **scalable and responsive** architecture, it ensures a smooth experience for both **buyers and agents**.
 
-## 🏡 About Dreamscape Realty
-Dreamscape Realty is a **modern real estate platform** that enables users to **browse, book, and manage property listings** seamlessly. Built with a scalable tech stack, this project provides an intuitive UI and robust backend services for property transactions.
+## 🚀 Tech Stack
+- **Frontend**: React.js, Vite, Tailwind CSS
+- **Backend**: Node.js, Express, MongoDB
+- **Authentication**: JWT
+- **Payments**: Razorpay Integration
+- **Hosting**: Vercel (Frontend), Render (Backend)
 
-🚀 **Live Demo:** [dreamscape-realty.vercel.app](https://dreamscape-realty.vercel.app/)
+## 🎯 Features
+✅ User & Admin Authentication (JWT)  
+✅ Property Listing & Booking  
+✅ Search & Filter Functionality  
+✅ Agent Assignment for Legal Documentation  
+✅ Razorpay Payment Integration for Service Fees  
+✅ Modern UI with Tailwind CSS  
 
-## ✨ Features
-- 🔍 **Browse Properties** - Find the perfect home from a vast listing database.
-- 🏠 **Property Booking** - Users can book properties through a smooth, interactive process.
-- 🛡 **Secure Authentication** - JWT-based authentication for both users and admins.
-- 📂 **Admin Dashboard** - Manage property listings, users, and bookings efficiently.
-- 📧 **Email Service Integration** - Receive booking confirmations via email.
+## 📂 Project Structure
+```
+Dreamscape-Realty/
+│── backend/
+│   ├── routes/
+│   ├── models/
+│   ├── controllers/
+│   ├── app.js
+│
+│── frontend/
+│   ├── vite-project/
+│   ├── src/
+│       ├── components/
+│       ├── pages/
+│       ├── App.jsx
+│
+└── README.md
+```
 
-## 🏗 Tech Stack
-### **Frontend**
-- ⚛️ React.js (Vite)
-- 🎨 Tailwind CSS
-
-### **Backend**
-- 🟢 Node.js, Express.js
-- 🗄 MongoDB (Mongoose ORM)
-- 🔐 JWT Authentication
-- 📧 Nodemailer for Email Service
-
-### **Deployment**
-- 🌍 **Frontend:** Vercel
-- ⚙ **Backend:** Render / Railway / Any Cloud Provider
-
-## 🛠 Local Setup
-Follow these steps to set up the project on your local machine.
-
-### **1️⃣ Clone the Repository**
+## 🎮 Getting Started
+### 🔧 Backend Setup
 ```bash
 git clone https://github.com/shubechavan/dreamscape-realty.git
-cd dreamscape-realty
-```
-
-### **2️⃣ Backend Setup**
-```bash
-cd backend
+cd dreamscape-realty/backend
 npm install
-npm start  # Runs on PORT 5000 (Default)
+npm start
 ```
 
-### **3️⃣ Frontend Setup**
+### 🎨 Frontend Setup
 ```bash
 cd frontend/vite-project
 npm install
-npm run dev  # Runs on localhost:5173
+npm run dev
 ```
 
-### **4️⃣ Environment Variables**
-Create a `.env` file in both **backend** and **frontend/vite-project** folders.
-#### **Backend (.env)**
-```
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-EMAIL_USER=your_email
-EMAIL_PASS=your_email_password
-```
-#### **Frontend (.env)**
-```
-VITE_API_URL=http://localhost:5000
-```
+## 🌐 Deployment
+- **Frontend** is hosted on **Vercel**: [Live Demo](https://dreamscape-realty.vercel.app/)  
+- **Backend** is hosted on **Render**
 
-## 📜 API Endpoints (Backend)
-| Method | Endpoint               | Description              |
-|--------|------------------------|--------------------------|
-| GET    | `/api/properties`      | Get all properties       |
-| POST   | `/api/properties`      | Add new property (Admin) |
-| POST   | `/api/users/register`  | User Registration       |
-| POST   | `/api/users/login`     | User Login              |
-| POST   | `/api/bookings`        | Book a property         |
+## 🛠 API Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/auth/register` | Register a new user |
+| POST | `/auth/login` | User login |
+| GET | `/properties` | Fetch all properties |
+| POST | `/book-property` | Book a property |
 
-## 🚀 Deployment Guide
-### **Frontend (Vercel)**
-1. Push your project to **GitHub**.
-2. Go to [Vercel](https://vercel.com/) and import your repo.
-3. Set the **Root Directory** to `frontend/vite-project`.
-4. Configure **Environment Variables**.
-5. Click **Deploy**.
+## 🎯 Contributing
+1. Fork the repo
+2. Create a new branch (`git checkout -b feature-name`)
+3. Commit changes (`git commit -m 'Added new feature'`)
+4. Push to branch (`git push origin feature-name`)
+5. Create a Pull Request
 
-### **Backend (Render/Railway)**
-1. Push the **backend** code to GitHub.
-2. Deploy it on **Render** / **Railway** / **Any Node.js Host**.
-3. Add **MongoDB URI** and other env variables.
-4. Connect frontend to deployed backend.
-
-## 👨‍💻 Contributing
-Pull requests are welcome! Follow these steps to contribute:
-1. Fork the repo & create a new branch.
-2. Make your changes & commit.
-3. Open a pull request.
-
-## 📞 Contact
-- ✉️ Email: shubhamchavancool332@gmail.com
-- 🔗 GitHub: [shubechavan](https://github.com/shubechavan)
+## 📜 License
+This project is **MIT Licensed**.
 
 ---
+<div align="center">
+🚀 Built with ❤️ by [Shubham Chavan](https://github.com/shubechavan)  
+</div>
 
-🌟 **If you like this project, consider giving it a star on GitHub!** ⭐
+
 
