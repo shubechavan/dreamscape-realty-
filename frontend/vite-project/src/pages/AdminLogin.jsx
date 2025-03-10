@@ -28,7 +28,7 @@ function AdminLogin() {
     e.preventDefault()
     setError("")
     try {
-      const response = await axios.post("http://localhost:3000/api/admin/signin", formData)
+      const response = await axios.post("https://dreamscape-realty.vercel.app/admin/signin", formData)
       if (response.data.token) {
         localStorage.setItem("adminToken", response.data.token)
         localStorage.setItem("adminEmail", formData.email)
