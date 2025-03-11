@@ -140,9 +140,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link to="/help" className="hover:text-white transition-colors">
-                  Help Center
-                </Link>
+                
               </li>
             </ul>
           </div>
