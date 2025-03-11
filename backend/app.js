@@ -4,10 +4,10 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import cors from "cors"
 import nodemailer from "nodemailer"
-import dotenv from "dotenv"
+import dotenv from "dotenv" // Import dotenv
 import Razorpay from "razorpay"
-import crypto from "crypto"
-dotenv.config()
+import crypto from "crypto" // Add crypto for payment verification
+dotenv.config() // Load environment variables
 console.log("Razorpay Key ID:", process.env.RAZORPAY_KEY_ID)
 console.log("Razorpay Key Secret:", process.env.RAZORPAY_KEY_SECRET ? "Loaded" : "Not Loaded")
 
@@ -15,8 +15,10 @@ const app = express()
 app.use(express.json())
 app.use(cors())
 
+// Connect to MongoDB using the MONGODB_URI from .env
 mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
 
+// Define MongoDB schemas and models
 const UserSchema = new mongoose.Schema({
   name: String,
   email: { type: String, unique: true },
@@ -43,6 +45,7 @@ const PropertySchema = new mongoose.Schema({
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 })
 
+// Update the AppointmentSchema to include payment information
 const AppointmentSchema = new mongoose.Schema({
   propertyId: { type: mongoose.Schema.Types.ObjectId, ref: "Property", required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -51,12 +54,13 @@ const AppointmentSchema = new mongoose.Schema({
   phoneNumber: { type: String, required: true },
   email: { type: String, required: true },
   status: { type: String, enum: ["pending", "confirmed", "cancelled"], default: "pending" },
-  fee: { type: Number, default: 500 },
+  fee: { type: Number, default: 500 }, // Default appointment fee in INR
   isPaid: { type: Boolean, default: false },
   paymentId: { type: String },
   paymentDate: { type: Date },
 })
 
+// Add Payment Schema
 const PaymentSchema = new mongoose.Schema({
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   propertyId: { type: mongoose.Schema.Types.ObjectId, ref: "Property", required: true },
@@ -69,6 +73,7 @@ const PaymentSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 })
 
+// Add a new schema for tracking purchased properties with more details
 const PurchaseSchema = new mongoose.Schema({
   propertyId: { type: mongoose.Schema.Types.ObjectId, ref: "Property", required: true },
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -78,180 +83,25 @@ const PurchaseSchema = new mongoose.Schema({
   status: { type: String, enum: ["completed", "pending", "failed"], default: "completed" },
 })
 
-const ContactSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-  },
-  email: {
-    type: String,
-    required: true,
-  },
-  details: {
-    type: String,
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  status: {
-    type: String,
-    enum: ["new", "in-progress", "resolved"],
-    default: "new",
-  },
-})
-
+// Add the Purchase model
 const Purchase = mongoose.model("Purchase", PurchaseSchema)
 
 const User = mongoose.model("User", UserSchema)
 const Property = mongoose.model("Property", PropertySchema)
 const Appointment = mongoose.model("Appointment", AppointmentSchema)
-const Payment = mongoose.model("Payment", PaymentSchema)
-const Contact = mongoose.model("Contact", ContactSchema)
+const Payment = mongoose.model("Payment", PaymentSchema) // Add Payment model
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 })
-
+// Function to send contact form email                                            //64392d39dfd90fb29e464fb7
 const sendContactEmail = async (name, email, details) => {
-  if (!process.env.CONTACT_EMAIL) {
-    console.warn("CONTACT_EMAIL environment variable is not defined. Using sender email as recipient.")
-    process.env.CONTACT_EMAIL = process.env.EMAIL_USER
-  }
-
-  const adminHtmlTemplate = `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-      }
-      .container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #eee;
-        border-radius: 5px;
-      }
-      .header {
-        background-color: #f8f8f8;
-        padding: 15px;
-        text-align: center;
-        border-bottom: 1px solid #eee;
-      }
-      .content {
-        padding: 20px;
-      }
-      .details {
-        background-color: #f9f9f9;
-        padding: 15px;
-        border-radius: 5px;
-        margin: 15px 0;
-      }
-      .footer {
-        text-align: center;
-        padding: 15px;
-        font-size: 12px;
-        color: #777;
-        border-top: 1px solid #eee;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h2>New Contact Form Submission</h2>
-      </div>
-      <div class="content">
-        <p>You have received a new message from the contact form:</p>
-        <div class="details">
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Email:</strong> ${email}</p>
-          <p><strong>Details:</strong> ${details}</p>
-          <p><strong>Date:</strong> ${new Date().toLocaleString()}</p>
-        </div>
-        <p>Please respond to this inquiry at your earliest convenience.</p>
-      </div>
-      <div class="footer">
-        <p>© ${new Date().getFullYear()} Dreamscape Realty. All rights reserved.</p>
-      </div>
-    </div>
-  </body>
-  </html>
-  `
-
-  const userHtmlTemplate = `
-  <!DOCTYPE html>
-  <html>
-  <head>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        line-height: 1.6;
-        color: #333;
-      }
-      .container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #eee;
-        border-radius: 5px;
-      }
-      .header {
-        background-color: #f8f8f8;
-        padding: 15px;
-        text-align: center;
-        border-bottom: 1px solid #eee;
-      }
-      .logo {
-        max-width: 200px;
-        height: auto;
-        margin-bottom: 10px;
-      }
-      .content {
-        padding: 20px;
-      }
-      .footer {
-        text-align: center;
-        padding: 15px;
-        font-size: 12px;
-        color: #777;
-        border-top: 1px solid #eee;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <img src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/WhatsApp_Image_2024-07-14_at_14.48.13_6a45f127-removebg-gJJvyU2V484RGIQT5DEYeT3E7HwC4O.png" alt="Dreamscape Realty Logo" class="logo">
-        <h2>Thank You for Contacting Dreamscape Realty</h2>
-      </div>
-      <div class="content">
-        <p>Dear ${name},</p>
-        <p>Thank you for reaching out to us. We have received your message and our team is reviewing the details.</p>
-        <p>We strive to respond to all inquiries within 24-48 hours during business days.</p>
-        <p>If your matter requires immediate attention, please call us at <strong>(+91) 9167093429</strong>.</p>
-        <p>Looking forward to assisting you with your real estate needs.</p>
-        <p>Best regards,<br>The Dreamscape Realty Team</p>
-      </div>
-      <div class="footer">
-        <p>© ${new Date().getFullYear()} Dreamscape Realty. All rights reserved.</p>
-        <p>This is an automated message, please do not reply to this email.</p>
-      </div>
-    </div>
-  </body>
-  </html>
-  `
+  // Email to admin (you)
   const adminMailOptions = {
-    from: process.env.EMAIL_USER,
-    to: process.env.CONTACT_EMAIL,
-    subject: "New Contact Us Message - Dreamscape Realty",
-    html: adminHtmlTemplate,
+    from: process.env.EMAIL_USER, // Use EMAIL_USER from .env
+    to: process.env.CONTACT_EMAIL, // Admin email for contact form
+    subject: "New Contact Us Message",
     text: `You have received a new message from the contact form:
 
     Name: ${name}
@@ -259,11 +109,11 @@ const sendContactEmail = async (name, email, details) => {
     Details: ${details}`,
   }
 
+  // Auto-reply email to the user
   const userMailOptions = {
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Thank you for contacting Dreamscape Realty",
-    html: userHtmlTemplate,
+    from: process.env.EMAIL_USER, // Use EMAIL_USER from .env
+    to: email, // The email provided by the user
+    subject: "Thank you for contacting us",
     text: `Dear ${name},
 
 Thank you for reaching out to us. We have received your message and our team is reviewing the details. We will get back to you as soon as possible.
@@ -271,31 +121,35 @@ Thank you for reaching out to us. We have received your message and our team is 
 Looking forward to assisting you.
 
 Best regards,
-Dreamscape Realty Team`,
+[Your Company Name] Team`,
   }
 
   try {
+    // Send email to admin
     await transporter.sendMail(adminMailOptions)
+
+    // Send auto-reply to the user
     await transporter.sendMail(userMailOptions)
+
     console.log("Contact email sent successfully")
-    return true
   } catch (error) {
     console.error("Error sending contact email:", error)
-    throw error
   }
 }
 
+// Nodemailer transporter setup using EMAIL_USER and EMAIL_PASS from .env
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    user: process.env.EMAIL_USER, // Use EMAIL_USER from .env
+    pass: process.env.EMAIL_PASS, // Use EMAIL_PASS from .env
   },
 })
 
+// Function to send registration email
 const sendRegistrationEmail = async (name, email) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.EMAIL_USER, // Use EMAIL_USER from .env
     to: email,
     subject: "Welcome to Dreamscape Realty",
     text: `Dear ${name},
@@ -344,6 +198,7 @@ The Dreamscape Realty Team`,
   }
 }
 
+// Get a single property
 app.get("/api/property/:id", async (req, res) => {
   try {
     const property = await Property.findById(req.params.id)
@@ -354,9 +209,10 @@ app.get("/api/property/:id", async (req, res) => {
   }
 })
 
+// Function to send property purchase email
 const sendPurchaseEmail = async (name, email, propertyTitle) => {
   const mailOptions = {
-    from: process.env.EMAIL_USER,
+    from: process.env.EMAIL_USER, // Use EMAIL_USER from .env
     to: email,
     subject: "Property Purchase Confirmation",
     text: `Dear ${name},
@@ -377,12 +233,13 @@ The Dreamscape Realty Team`,
   }
 }
 
+// Middleware to verify JWT token
 const verifyToken = (req, res, next) => {
   const token = req.header("Authorization")?.split(" ")[1]
   if (!token) return res.status(401).json({ error: "Access denied" })
 
   try {
-    const verified = jwt.verify(token, process.env.JWT_SECRET)
+    const verified = jwt.verify(token, process.env.JWT_SECRET) // Use JWT_SECRET from .env
     req.user = verified
     next()
   } catch (error) {
@@ -390,11 +247,13 @@ const verifyToken = (req, res, next) => {
   }
 }
 
+// Middleware to check if user is admin
 const isAdmin = (req, res, next) => {
   if (!req.user.isAdmin) return res.status(403).json({ error: "Admin access required" })
   next()
 }
 
+// User registration
 app.post("/api/user/register", async (req, res) => {
   try {
     const { name, email, password } = req.body
@@ -403,6 +262,7 @@ app.post("/api/user/register", async (req, res) => {
     const user = new User({ name, email, password: hashedPassword })
     await user.save()
 
+    // Send registration email
     await sendRegistrationEmail(name, email)
 
     res.status(201).json({ message: "User registered successfully" })
@@ -411,6 +271,7 @@ app.post("/api/user/register", async (req, res) => {
   }
 })
 
+// User login
 app.post("/api/user/signin", async (req, res) => {
   try {
     const { email, password } = req.body
@@ -420,13 +281,14 @@ app.post("/api/user/signin", async (req, res) => {
     const validPassword = await bcrypt.compare(password, user.password)
     if (!validPassword) return res.status(400).json({ error: "Invalid password" })
 
-    const token = jwt.sign({ _id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET)
+    const token = jwt.sign({ _id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET) // Use JWT_SECRET from .env
     res.json({ token, user: { id: user._id, name: user.name, email: user.email, isAdmin: user.isAdmin } })
   } catch (error) {
     res.status(400).json({ error: error.message })
   }
 })
 
+// Get all properties
 app.get("/api/properties", async (req, res) => {
   try {
     const properties = await Property.find()
@@ -436,6 +298,7 @@ app.get("/api/properties", async (req, res) => {
   }
 })
 
+// Get a single property
 app.get("/api/property/:id", async (req, res) => {
   try {
     const property = await Property.findById(req.params.id)
@@ -446,6 +309,7 @@ app.get("/api/property/:id", async (req, res) => {
   }
 })
 
+// Purchase a property
 app.post("/api/user/purchase-property/:id", verifyToken, async (req, res) => {
   try {
     const { paymentId } = req.body
@@ -457,11 +321,13 @@ app.post("/api/user/purchase-property/:id", verifyToken, async (req, res) => {
     const user = await User.findById(req.user._id)
     if (!user) return res.status(404).json({ error: "User not found" })
 
+    // Add to user's purchased properties array
     if (!user.purchasedProperties.includes(property._id)) {
       user.purchasedProperties.push(property._id)
       await user.save()
     }
 
+    // Create a detailed purchase record
     const purchase = new Purchase({
       propertyId: property._id,
       userId: user._id,
@@ -473,6 +339,7 @@ app.post("/api/user/purchase-property/:id", verifyToken, async (req, res) => {
 
     await purchase.save()
 
+    // Send purchase confirmation email
     await sendPurchaseEmail(user.name, user.email, property.title)
 
     res.json({
@@ -484,6 +351,7 @@ app.post("/api/user/purchase-property/:id", verifyToken, async (req, res) => {
   }
 })
 
+// Get user's purchased properties
 app.get("/api/user/purchased-property", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("purchasedProperties")
@@ -493,6 +361,7 @@ app.get("/api/user/purchased-property", verifyToken, async (req, res) => {
   }
 })
 
+// Add a new property (admin only)
 app.post("/api/properties", verifyToken, isAdmin, async (req, res) => {
   try {
     const property = new Property(req.body)
@@ -503,6 +372,7 @@ app.post("/api/properties", verifyToken, isAdmin, async (req, res) => {
   }
 })
 
+// Update a property (admin only)
 app.put("/api/properties/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const property = await Property.findByIdAndUpdate(req.params.id, req.body, { new: true })
@@ -513,6 +383,7 @@ app.put("/api/properties/:id", verifyToken, isAdmin, async (req, res) => {
   }
 })
 
+// Delete a property (admin only)
 app.delete("/api/properties/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const property = await Property.findByIdAndDelete(req.params.id)
@@ -523,6 +394,7 @@ app.delete("/api/properties/:id", verifyToken, isAdmin, async (req, res) => {
   }
 })
 
+// User Dashboard
 app.get("/api/user/dashboard", verifyToken, async (req, res) => {
   try {
     const user = await User.findById(req.user._id).populate("purchasedProperties")
@@ -544,6 +416,7 @@ app.get("/api/user/dashboard", verifyToken, async (req, res) => {
   }
 })
 
+// Admin Dashboard
 app.get("/api/admin/dashboard", verifyToken, isAdmin, async (req, res) => {
   try {
     const totalUsers = await User.countDocuments()
@@ -561,37 +434,21 @@ app.get("/api/admin/dashboard", verifyToken, isAdmin, async (req, res) => {
     res.status(400).json({ error: error.message })
   }
 })
-
+//contact
 app.post("/api/contact", async (req, res) => {
   try {
     const { name, email, details } = req.body
 
-    const newContact = new Contact({
-      name,
-      email,
-      details,
-      status: "new",
-    })
+    // Send contact form email
+    await sendContactEmail(name, email, details)
 
-    await newContact.save()
-    console.log("Contact form submission saved to database with ID:", newContact._id)
-
-    try {
-      await sendContactEmail(name, email, details)
-    } catch (emailError) {
-      console.error("Error sending email, but contact was saved:", emailError)
-    }
-
-    res.status(200).json({
-      message: "Your message has been sent successfully!",
-      contactId: newContact._id,
-    })
+    res.status(200).json({ message: "Your message has been sent successfully!" })
   } catch (error) {
-    console.error("Error processing contact form:", error)
     res.status(500).json({ error: "Error sending message. Please try again." })
   }
 })
 
+// Get a single property
 app.get("/api/property/:id", async (req, res) => {
   try {
     const property = await Property.findById(req.params.id)
@@ -602,6 +459,7 @@ app.get("/api/property/:id", async (req, res) => {
   }
 })
 
+// Submit a property for selling
 app.post("/api/property/sell", verifyToken, async (req, res) => {
   try {
     const { title, description, price, address, city, country, bedrooms, bathrooms, parking, image } = req.body
@@ -629,16 +487,17 @@ app.post("/api/property/sell", verifyToken, async (req, res) => {
   }
 })
 
+// Create a Razorpay order
 app.post("/api/create-payment", verifyToken, async (req, res) => {
   try {
     const { amount, currency = "INR" } = req.body
     const userId = req.user._id
 
     const options = {
-      amount: amount * 100,
+      amount: amount * 100, // Razorpay works in paise (₹1 = 100 paise)
       currency: currency,
       receipt: `receipt_${Date.now()}`,
-      payment_capture: 1,
+      payment_capture: 1, // Auto-capture the payment
       notes: {
         userId: userId.toString(),
       },
@@ -650,7 +509,7 @@ app.post("/api/create-payment", verifyToken, async (req, res) => {
       orderId: order.id,
       amount: order.amount,
       currency: order.currency,
-      keyId: process.env.RAZORPAY_KEY_ID,
+      keyId: process.env.RAZORPAY_KEY_ID, // Send the key ID to the client
     })
   } catch (error) {
     console.error("Error creating Razorpay order:", error)
@@ -658,18 +517,22 @@ app.post("/api/create-payment", verifyToken, async (req, res) => {
   }
 })
 
+// Verify Razorpay payment
 app.post("/api/verify-payment", verifyToken, async (req, res) => {
   try {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature, propertyId } = req.body
 
+    // Create a signature verification data string
     const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
     shasum.update(`${razorpay_order_id}|${razorpay_payment_id}`)
     const digest = shasum.digest("hex")
 
+    // Verify signature
     if (digest !== razorpay_signature) {
       return res.status(400).json({ error: "Transaction not legit!" })
     }
 
+    // Save payment details
     const payment = new Payment({
       userId: req.user._id,
       propertyId,
@@ -682,6 +545,7 @@ app.post("/api/verify-payment", verifyToken, async (req, res) => {
 
     await payment.save()
 
+    // Return success response
     res.json({
       success: true,
       message: "Payment has been verified",
@@ -693,10 +557,11 @@ app.post("/api/verify-payment", verifyToken, async (req, res) => {
   }
 })
 
+// Helper function to get property price
 async function getPropertyPrice(propertyId) {
   try {
     const property = await Property.findById(propertyId)
-    return property ? property.price * 100 : 0
+    return property ? property.price * 100 : 0 // Return in paise
   } catch (error) {
     console.error("Error getting property price:", error)
     return 0
@@ -707,6 +572,7 @@ app.post("/api/admin/register", (req, res) => {
   return res.status(403).json({ error: "Admin registration is not allowed." })
 })
 
+// Admin login
 app.post("/api/admin/signin", async (req, res) => {
   try {
     const { email, password } = req.body
@@ -733,6 +599,8 @@ app.post("/api/admin/signin", async (req, res) => {
   }
 })
 
+// Fetch all admin users
+// Admin Dashboard - Comprehensive Data
 app.get("/api/admin/dashboard/all", verifyToken, isAdmin, async (req, res) => {
   try {
     const users = await User.find().select("-password").populate("purchasedProperties")
@@ -756,6 +624,7 @@ app.get("/api/admin/dashboard/all", verifyToken, isAdmin, async (req, res) => {
   }
 })
 
+// Admin Dashboard - Metrics
 app.get("/api/admin/dashboard/metrics", verifyToken, isAdmin, async (req, res) => {
   try {
     const timeframe = req.query.timeframe || "week"
@@ -776,6 +645,7 @@ app.get("/api/admin/dashboard/metrics", verifyToken, isAdmin, async (req, res) =
   }
 })
 
+// Admin Dashboard - Property Analytics
 app.get("/api/admin/dashboard/property-analytics", verifyToken, isAdmin, async (req, res) => {
   try {
     const analytics = {
@@ -797,6 +667,7 @@ app.get("/api/admin/dashboard/property-analytics", verifyToken, isAdmin, async (
   }
 })
 
+// Admin Dashboard - User Analytics
 app.get("/api/admin/dashboard/user-analytics", verifyToken, isAdmin, async (req, res) => {
   try {
     const analytics = {
@@ -811,7 +682,7 @@ app.get("/api/admin/dashboard/user-analytics", verifyToken, isAdmin, async (req,
     res.status(500).json({ error: "Failed to fetch user analytics", details: error.message })
   }
 })
-
+// Add this route after other API routes
 app.post("/api/appointments", verifyToken, async (req, res) => {
   try {
     const { propertyId, date, time, phoneNumber, email } = req.body
@@ -824,12 +695,13 @@ app.post("/api/appointments", verifyToken, async (req, res) => {
       time,
       phoneNumber,
       email,
-      fee: 500,
+      fee: 500, // Default appointment fee
       isPaid: false,
     })
 
     await newAppointment.save()
 
+    // Return the appointment ID for payment
     res.status(201).json({
       message: "Appointment created. Please complete payment to confirm.",
       appointment: newAppointment,
@@ -844,7 +716,7 @@ app.post("/api/appointments", verifyToken, async (req, res) => {
 app.get("/api/properties/search", async (req, res) => {
   try {
     const { query } = req.query
-    console.log("Received search query:", query)
+    console.log("Received search query:", query) // Debug log
     const properties = await Property.find({
       $or: [
         { title: { $regex: query, $options: "i" } },
@@ -854,14 +726,14 @@ app.get("/api/properties/search", async (req, res) => {
         { country: { $regex: query, $options: "i" } },
       ],
     })
-    console.log("Found properties:", properties.length)
+    console.log("Found properties:", properties.length) // Debug log
     res.json(properties)
   } catch (error) {
-    console.error("Error in search:", error)
+    console.error("Error in search:", error) // Debug log
     res.status(400).json({ error: error.message })
   }
 })
-
+// Add this route to get user's appointments
 app.get("/api/user/appointments", verifyToken, async (req, res) => {
   try {
     const appointments = await Appointment.find({ userId: req.user._id }).populate("propertyId")
@@ -871,21 +743,25 @@ app.get("/api/user/appointments", verifyToken, async (req, res) => {
   }
 })
 
+// Add a new endpoint to create an appointment payment
 app.post("/api/create-appointment-payment", verifyToken, async (req, res) => {
   try {
     const { appointmentId } = req.body
 
+    // Get the appointment
     const appointment = await Appointment.findById(appointmentId)
     if (!appointment) {
       return res.status(404).json({ error: "Appointment not found" })
     }
 
+    // Check if it's already paid
     if (appointment.isPaid) {
       return res.status(400).json({ error: "Appointment is already paid" })
     }
 
+    // Create Razorpay order for appointment fee
     const options = {
-      amount: appointment.fee * 100,
+      amount: appointment.fee * 100, // Convert to paise
       currency: "INR",
       receipt: `appointment_${appointmentId}`,
       payment_capture: 1,
@@ -909,10 +785,12 @@ app.post("/api/create-appointment-payment", verifyToken, async (req, res) => {
   }
 })
 
+// Add an endpoint to verify appointment payment
 app.post("/api/verify-appointment-payment", verifyToken, async (req, res) => {
   try {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature, appointmentId } = req.body
 
+    // Verify signature
     const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
     shasum.update(`${razorpay_order_id}|${razorpay_payment_id}`)
     const digest = shasum.digest("hex")
@@ -921,6 +799,7 @@ app.post("/api/verify-appointment-payment", verifyToken, async (req, res) => {
       return res.status(400).json({ error: "Transaction not legit!" })
     }
 
+    // Update appointment as paid
     const appointment = await Appointment.findById(appointmentId)
     if (!appointment) {
       return res.status(404).json({ error: "Appointment not found" })
@@ -932,18 +811,20 @@ app.post("/api/verify-appointment-payment", verifyToken, async (req, res) => {
     appointment.status = "confirmed"
     await appointment.save()
 
+    // Save payment details
     const payment = new Payment({
       userId: req.user._id,
       propertyId: appointment.propertyId,
       razorpayOrderId: razorpay_order_id,
       razorpayPaymentId: razorpay_payment_id,
       razorpaySignature: razorpay_signature,
-      amount: appointment.fee * 100,
+      amount: appointment.fee * 100, // In paise
       status: "completed",
     })
 
     await payment.save()
 
+    // Send confirmation email
     await sendAppointmentConfirmationEmail(appointment.email, appointment)
 
     res.json({
@@ -957,6 +838,7 @@ app.post("/api/verify-appointment-payment", verifyToken, async (req, res) => {
   }
 })
 
+// Add an endpoint to get all purchases for admin
 app.get("/api/admin/purchases", verifyToken, isAdmin, async (req, res) => {
   try {
     const purchases = await Purchase.find()
@@ -970,6 +852,7 @@ app.get("/api/admin/purchases", verifyToken, isAdmin, async (req, res) => {
   }
 })
 
+// Add an endpoint to get user's purchases with more details
 app.get("/api/user/purchases", verifyToken, async (req, res) => {
   try {
     const purchases = await Purchase.find({ userId: req.user._id }).populate("propertyId").sort({ purchaseDate: -1 })
@@ -980,34 +863,12 @@ app.get("/api/user/purchases", verifyToken, async (req, res) => {
   }
 })
 
-app.get("/api/admin/contacts", verifyToken, isAdmin, async (req, res) => {
-  try {
-    const contacts = await Contact.find().sort({ createdAt: -1 })
-    res.json(contacts)
-  } catch (error) {
-    res.status(500).json({ error: "Failed to fetch contact submissions", details: error.message })
-  }
-})
-
-app.put("/api/admin/contacts/:id", verifyToken, isAdmin, async (req, res) => {
-  try {
-    const { status } = req.body
-    const contact = await Contact.findByIdAndUpdate(req.params.id, { status }, { new: true })
-
-    if (!contact) {
-      return res.status(404).json({ error: "Contact submission not found" })
-    }
-
-    res.json(contact)
-  } catch (error) {
-    res.status(500).json({ error: "Failed to update contact status", details: error.message })
-  }
-})
-
+// Start the server
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`)
 })
 
+// Test the server
 console.log("Server is set up and running. You can now test the API endpoints.")
 
