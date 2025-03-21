@@ -359,7 +359,7 @@ function SingleProperty() {
                 </div>
 
                 <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h3 className="text-xl font-semibold mb-4">Ready to Purchase?</h3>
+                  <h3 className="text-xl font-semibold mb-4">Interested in this Property?</h3>
                   <button
                     onClick={handlePayment}
                     disabled={processingPayment}
@@ -370,7 +370,7 @@ function SingleProperty() {
                     ) : (
                       <>
                         <CreditCard className="mr-2 h-5 w-5" />
-                        Pay with Razorpay
+                        Contact Agent
                       </>
                     )}
                   </button>
