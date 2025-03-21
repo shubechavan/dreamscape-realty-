@@ -361,18 +361,22 @@ function SingleProperty() {
                 <div className="mt-6 pt-6 border-t border-gray-200">
                   <h3 className="text-xl font-semibold mb-4">Interested in this Property?</h3>
                   <button
-                    onClick={handlePayment}
-                    disabled={processingPayment}
-                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-700 transition duration-300 disabled:opacity-70"
+                    onClick={() => {
+                      // Store property details in localStorage for the contact form
+                      localStorage.setItem(
+                        "inquiryProperty",
+                        JSON.stringify({
+                          id: property._id,
+                          title: property.title,
+                        }),
+                      )
+                      // Navigate to contact page
+                      navigate("/contact")
+                    }}
+                    className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg flex items-center justify-center text-lg font-semibold hover:bg-blue-700 transition duration-300"
                   >
-                    {processingPayment ? (
-                      "Processing..."
-                    ) : (
-                      <>
-                        <CreditCard className="mr-2 h-5 w-5" />
-                        Contact Agent
-                      </>
-                    )}
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Contact Agent
                   </button>
                 </div>
               </div>
