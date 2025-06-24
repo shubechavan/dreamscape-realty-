@@ -2,6 +2,7 @@
 
 import { Link } from "react-router-dom"
 import { useState, useEffect } from "react"
+import { User, GraduationCap, Sparkles } from "lucide-react"
 
 const AboutUs = () => {
   const [secretKeyPressed, setSecretKeyPressed] = useState(false)
@@ -113,14 +114,50 @@ const AboutUs = () => {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">Meet Our Team</h2>
-             <div className="mb-8 flex justify-center md:justify-end">
-  <div className="text-right">
-    <h3 className="text-lg font-semibold text-gray-800">Shubham Chavan</h3>
-    <p className="text-sm text-gray-600">KPB Hinduja College</p>
-    <p className="text-sm text-gray-500 italic">Creator of Dreamscape Realty</p>
-  </div>
-</div>
+              <div className="flex justify-center">
+                <div className="relative bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-8 rounded-2xl border border-blue-100 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 max-w-md">
+                  {/* Decorative elements */}
+                  <div className="absolute top-4 right-4">
+                    <Sparkles className="w-6 h-6 text-blue-400 animate-pulse" />
+                  </div>
+                  <div className="absolute -top-2 -left-2 w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full opacity-20"></div>
+                  <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-gradient-to-br from-purple-400 to-pink-500 rounded-full opacity-30"></div>
 
+                  {/* Profile section */}
+                  <div className="text-center mb-6">
+                    <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                      <User className="w-10 h-10 text-white" />
+                    </div>
+
+                    {/* Enhanced name styling */}
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700 bg-clip-text text-transparent mb-2 tracking-wide">
+                      Shubham Chavan
+                    </h3>
+
+                    {/* Subtitle with icon */}
+                    <div className="flex items-center justify-center gap-2 mb-4">
+                      <GraduationCap className="w-5 h-5 text-blue-500" />
+                      <p className="text-blue-600 font-medium text-lg">KPB Hinduja College</p>
+                    </div>
+
+                    {/* Decorative line */}
+                    <div className="w-16 h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mx-auto mb-4"></div>
+                  </div>
+
+                  {/* Description */}
+                  <p className="text-gray-700 text-center leading-relaxed font-medium">
+                    <span className="text-blue-600 font-semibold">Founder & Visionary</span> behind Dreamscape Realty,
+                    bringing innovative solutions to revolutionize the real estate market experience.
+                  </p>
+
+                  {/* Achievement badge */}
+                  <div className="mt-6 text-center">
+                    <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 text-blue-700 text-sm font-semibold rounded-full border border-blue-200">
+                      🏆 Real Estate Innovator
+                    </span>
+                  </div>
+                </div>
+              </div>
             </section>
 
             <section className="text-center">
@@ -148,7 +185,14 @@ const AboutUs = () => {
             </section>
 
             <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
-              <p>© 2024 Dreamscape Realty. Created by Shubham Chavan from KPB Hinduja College.</p>
+              <p>
+                © 2024 Dreamscape Realty. Created by
+                <span className="font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  {" "}
+                  Shubham Chavan{" "}
+                </span>
+                from KPB Hinduja College.
+              </p>
               {/* Hidden admin link in footer text - only visible on hover */}
               <div className="mt-2 text-[0.1px] text-gray-100 hover:text-gray-500 transition-colors duration-300">
                 <Link to="/admin/login">Admin</Link>
@@ -162,4 +206,3 @@ const AboutUs = () => {
 }
 
 export default AboutUs
-
