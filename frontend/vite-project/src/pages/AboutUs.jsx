@@ -121,13 +121,7 @@ const AboutUs = () => {
                     Co-creator of Dreamscape Realty, bringing innovative solutions to the real estate market.
                   </p>
                 </div>
-                <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-                  <h3 className="text-xl font-semibold text-blue-700 mb-2">Vinay Yadav</h3>
-                  <p className="text-gray-600">KPB Hinduja College</p>
-                  <p className="text-gray-600 mt-2">
-                    Co-creator of Dreamscape Realty, dedicated to transforming the property search experience.
-                  </p>
-                </div>
+                
               </div>
             </section>
 
@@ -156,7 +150,7 @@ const AboutUs = () => {
             </section>
 
             <footer className="mt-12 pt-6 border-t border-gray-200 text-center text-gray-500 text-sm">
-              <p>© 2024 Dreamscape Realty. Created by Shubham Chavan & Vinay Yadav from KPB Hinduja College.</p>
+              <p>© 2024 Dreamscape Realty. Created by Shubham Chavan from KPB Hinduja College.</p>
               {/* Hidden admin link in footer text - only visible on hover */}
               <div className="mt-2 text-[0.1px] text-gray-100 hover:text-gray-500 transition-colors duration-300">
                 <Link to="/admin/login">Admin</Link>
