@@ -113,16 +113,14 @@ const AboutUs = () => {
 
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-700 mb-4">Meet Our Team</h2>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
-                  <h3 className="text-xl font-semibold text-blue-700 mb-2">Shubham Chavan</h3>
-                  <p className="text-gray-600">KPB Hinduja College</p>
-                  <p className="text-gray-600 mt-2">
-                    Co-creator of Dreamscape Realty, bringing innovative solutions to the real estate market.
-                  </p>
-                </div>
-                
-              </div>
+             <div className="mb-8 flex justify-center md:justify-end">
+  <div className="text-right">
+    <h3 className="text-lg font-semibold text-gray-800">Shubham Chavan</h3>
+    <p className="text-sm text-gray-600">KPB Hinduja College</p>
+    <p className="text-sm text-gray-500 italic">Creator of Dreamscape Realty</p>
+  </div>
+</div>
+
             </section>
 
             <section className="text-center">
